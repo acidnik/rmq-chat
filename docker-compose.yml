@@ -1,0 +1,29 @@
+services:
+  api1:
+    build: .
+    command: python3 app.py
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/code
+    environment:
+      - PORT=8000
+      - AMQP_URL=amqp://guest:guest@rmq:5672
+  
+  api2:
+    build: .
+    command: python3 app.py
+    ports:
+      - 8001:8001
+    volumes:
+      - .:/code
+    environment:
+      - PORT=8001
+      - AMQP_URL=amqp://guest:guest@rmq:5672
+
+
+  rmq:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672

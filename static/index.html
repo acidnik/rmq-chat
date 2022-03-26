@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Who needs telegram anyway?</title>
+  <script src="https://unpkg.com/vue@2"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="chat">
+        <div class="message" v-for="msg in messages">
+            {{ msg }}
+        </div>
+    </div>
+    <div id="input">
+        <input type="text" v-model="input"><input type="button" value="send" v-on:click="send">
+    </div>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+          'messages': [],
+          'input': '',
+      },
+      created: function() {
+        let url = `ws://${window.location.host}/chat`
+        this.websocket = new WebSocket(url)
+        
+        that = this
+
+        this.websocket.onmessage = function (event) {
+            that.messages.push(event.data)
+        }
+                
+        this.websocket.onopen = function (event) {
+            that.messages.push(`# Connected to ${url}`)
+        }
+        
+        this.websocket.onerror = function (event) {
+          that.messages.push(`# error: ${event.data}`)
+          console.log(event)
+        }
+      },
+      methods: {
+          send: function(event) {
+            if (this.input) {
+              this.websocket.send(this.input)
+              this.input = ''
+            }
+          }
+      }
+    })
+  </script>
+</body>
+</html>
